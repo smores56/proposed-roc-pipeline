@@ -1,36 +1,34 @@
+use crate::base::problem::SpecializeTypesProblem;
+use crate::base::symbol::IdentId;
 use crate::base::Number;
-use crate::problem::SpecializeTypesProblem;
+use crate::env::StringLiteralId;
 use crate::soa::{Index, Slice, Slice3};
-use crate::string_interner::InternedStringId;
-use crate::symbol::IdentId;
 
-use super::type_::MonoTypeId;
-use super::MonoFieldId;
+use super::type_::TypeSpecTypeId;
+use super::TypeSpecFieldId;
 
 #[derive(Clone, Copy, Debug, PartialEq)]
-pub struct MonoPatternId {
-    inner: Index<MonoPattern>,
-}
+pub struct TypeSpecPatternId(Index<TypeSpecPattern>);
 
 #[derive(Clone, Copy, Debug, PartialEq)]
-pub enum MonoPattern {
+pub enum TypeSpecPattern {
     Identifier(IdentId),
-    As(MonoPatternId, IdentId),
-    StrLiteral(InternedStringId),
+    As(TypeSpecPatternId, IdentId),
+    StrLiteral(StringLiteralId),
     NumberLiteral(Number),
     AppliedTag {
-        tag_union_type: MonoTypeId,
+        tag_union_type: TypeSpecTypeId,
         tag_name: IdentId,
-        args: Slice<MonoPatternId>,
+        args: Slice<TypeSpecPatternId>,
     },
     StructDestructure {
-        struct_type: MonoTypeId,
-        destructs: Slice3<IdentId, MonoFieldId, DestructType>,
-        opt_spread: Option<(MonoTypeId, MonoPatternId)>,
+        struct_type: TypeSpecTypeId,
+        destructs: Slice3<IdentId, TypeSpecFieldId, TypeSpecDestructType>,
+        opt_spread: Option<(TypeSpecTypeId, TypeSpecPatternId)>,
     },
     List {
-        elem_type: MonoTypeId,
-        patterns: Slice<MonoPatternId>,
+        elem_type: TypeSpecTypeId,
+        patterns: Slice<TypeSpecPatternId>,
 
         /// Where a rest pattern splits patterns before and after it, if it does at all.
         /// If present, patterns at index >= the rest index appear after the rest pattern.
@@ -46,7 +44,7 @@ pub enum MonoPattern {
 }
 
 #[derive(Clone, Copy, Debug, PartialEq)]
-pub enum DestructType {
+pub enum TypeSpecDestructType {
     Required,
-    Guard(MonoTypeId, MonoPatternId),
+    Guard(TypeSpecTypeId, TypeSpecPatternId),
 }

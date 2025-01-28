@@ -4,15 +4,15 @@ use crate::{
 };
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
-pub struct FunctionSpecializeTypeId {
-    index: Index<FunctionSpecializeType>,
+pub struct FuncSpecTypeId {
+    index: Index<FuncSpecType>,
 }
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
-pub enum FunctionSpecializeType {
+pub enum FuncSpecType {
     Primitive(Primitive),
-    Box(FunctionSpecializeTypeId),
-    List(FunctionSpecializeTypeId),
-    Struct(NonEmptySlice<FunctionSpecializeTypeId>),
-    TagUnion(NonEmptySlice<FunctionSpecializeTypeId>),
+    Box(FuncSpecTypeId),
+    List(FuncSpecTypeId),
+    Struct(NonEmptySlice<FuncSpecTypeId>),
+    TagUnion(NonEmptySlice<FuncSpecTypeId>),
 }

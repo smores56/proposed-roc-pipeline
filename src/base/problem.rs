@@ -1,20 +1,24 @@
 #[derive(Debug)]
-pub enum Problem {}
+pub enum Problem {
+    CompilerProblem(CompilerProblem),
+}
 
 #[derive(Debug)]
 pub enum CompilerProblem {
     SpecializeTypes(SpecializeTypesProblem),
-    FunctionLift(FunctionLiftProblem),
+    LiftFunctions(LiftFunctionsProblem),
+    SolveFunctions(SolveFunctionsProblem),
+    SpecializeFunctions(SpecializeFunctionsProblem),
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum SpecializeTypesProblem {}
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum FunctionLiftProblem {}
+pub enum LiftFunctionsProblem {}
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum FunctionSolveProblem {}
+pub enum SolveFunctionsProblem {}
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum FunctionSpecializeProblem {}
+pub enum SpecializeFunctionsProblem {}

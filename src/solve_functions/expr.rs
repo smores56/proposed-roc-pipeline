@@ -1,57 +1,45 @@
 use core::mem::MaybeUninit;
 
-use crate::base::foreign_symbol::ForeignSymbolId;
-use crate::base::low_level::LowLevel;
-use crate::base::problem::FunctionSolveProblem;
+use crate::base::problem::SolveFunctionsProblem;
 use crate::base::symbol::{IdentId, Symbol};
 use crate::base::Number;
 use crate::env::{FieldNameId, StringLiteralId};
 use crate::soa::{Index, NonEmptySlice, Slice, Slice2};
 
-use super::pattern::FunctionSolvePatternId;
-use super::type_::FunctionSolveTypeId;
+use super::pattern::FuncSolvePatternId;
+use super::type_::FuncSolveTypeId;
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
-pub struct FunctionSolveExprId {
-    index: Index<FunctionSolveExpr>,
+pub struct FuncSolveExprId {
+    index: Index<FuncSolveExpr>,
 }
 
 #[derive(Clone, Copy, Debug, PartialEq)]
-pub enum FunctionSolveExpr {
+pub enum FuncSolveExpr {
     Str(StringLiteralId),
     Number(Number),
     List {
-        elem_type: FunctionSolveTypeId,
-        elems: Slice<FunctionSolveExprId>,
+        elem_type: FuncSolveTypeId,
+        elems: Slice<FuncSolveExprId>,
     },
-    Lookup(IdentId, FunctionSolveTypeId),
+    Lookup(IdentId, FuncSolveTypeId),
 
     /// This is *only* for calling functions, not for tag application.
     /// The Tag variant contains any applied values inside it.
     Call {
-        fn_type: FunctionSolveTypeId,
-        fn_expr: FunctionSolveExprId,
-        args: Slice2<FunctionSolveTypeId, FunctionSolveExprId>,
-    },
-    RunLowLevel {
-        op: LowLevel,
-        args: Slice<(FunctionSolveTypeId, FunctionSolveExprId)>,
-        ret_type: FunctionSolveTypeId,
-    },
-    ForeignCall {
-        foreign_symbol: ForeignSymbolId,
-        args: Slice<(FunctionSolveTypeId, FunctionSolveExprId)>,
-        ret_type: FunctionSolveTypeId,
+        fn_type: FuncSolveTypeId,
+        fn_expr: FuncSolveExprId,
+        args: Slice2<FuncSolveTypeId, FuncSolveExprId>,
     },
 
     FunctionPack {
         fn_symbol: Symbol,
-        captures: Slice<(FunctionSolveTypeId, FunctionSolvePatternId)>,
+        captures: Slice<(FuncSolveTypeId, FuncSolvePatternId)>,
     },
 
     Unit,
 
-    Struct(NonEmptySlice<FunctionSolveExpr>),
+    Struct(NonEmptySlice<FuncSolveExpr>),
 
     /// Look up exactly one field on a record, tuple, or tag payload.
     /// At this point we've already unified those concepts and have
@@ -62,49 +50,43 @@ pub enum FunctionSolveExpr {
     /// by alignment and converted to byte offsets, but we in this
     /// phase we aren't concerned with alignment or sizes, just indices.
     StructAccess {
-        record_expr: FunctionSolveExprId,
-        record_type: FunctionSolveTypeId,
-        field_type: FunctionSolveTypeId,
+        record_expr: FuncSolveExprId,
+        record_type: FuncSolveTypeId,
+        field_type: FuncSolveTypeId,
         field_id: FieldNameId,
-    },
-
-    RecordUpdate {
-        record_type: FunctionSolveTypeId,
-        record_name: IdentId,
-        updates: Slice2<FieldNameId, FunctionSolveExprId>,
     },
 
     Tag {
         discriminant: u16,
-        tag_union_type: FunctionSolveTypeId,
-        args: Slice2<FunctionSolveTypeId, FunctionSolveExprId>,
+        tag_union_type: FuncSolveTypeId,
+        args: Slice2<FuncSolveTypeId, FuncSolveExprId>,
     },
 
     When {
         /// The value being matched on
-        value: FunctionSolveExprId,
+        value: FuncSolveExprId,
         /// The type of the value being matched on
-        value_type: FunctionSolveTypeId,
+        value_type: FuncSolveTypeId,
         /// The return type of all branches and thus the whole when expression
-        branch_type: FunctionSolveTypeId,
+        branch_type: FuncSolveTypeId,
         /// The branches of the when expression
-        branches: NonEmptySlice<WhenBranch>,
+        branches: NonEmptySlice<FuncSolveWhenBranch>,
     },
 
-    CompilerBug(FunctionSolveProblem),
+    CompilerBug(SolveFunctionsProblem),
 }
 
 #[derive(Clone, Copy, Debug, PartialEq)]
-pub struct WhenBranch {
+pub struct FuncSolveWhenBranch {
     /// The pattern(s) to match the value against
-    pub patterns: NonEmptySlice<FunctionSolvePatternId>,
+    pub patterns: NonEmptySlice<FuncSolvePatternId>,
     /// A boolean expression that must be true for this branch to be taken
-    pub guard: Option<FunctionSolveExprId>,
+    pub guard: Option<FuncSolveExprId>,
     /// The expression to produce if the pattern matches
-    pub value: FunctionSolveExprId,
+    pub value: FuncSolveExprId,
 }
 
 #[derive(Debug, Default)]
-pub struct WhenBranches {
-    branches: Vec<MaybeUninit<WhenBranch>>,
+pub struct FuncSolveWhenBranches {
+    branches: Vec<MaybeUninit<FuncSolveWhenBranch>>,
 }

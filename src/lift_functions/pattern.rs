@@ -4,32 +4,32 @@ use crate::base::Number;
 use crate::env::{FieldNameId, StringLiteralId};
 use crate::soa::{Index, Slice, Slice3};
 
-use super::type_::FunctionLiftTypeId;
+use super::type_::FuncLiftTypeId;
 
 #[derive(Clone, Copy, Debug, PartialEq)]
-pub struct FunctionLiftPatternId {
-    inner: Index<FunctionLiftPattern>,
+pub struct FuncLiftPatternId {
+    inner: Index<FuncLiftPattern>,
 }
 
 #[derive(Clone, Copy, Debug, PartialEq)]
-pub enum FunctionLiftPattern {
+pub enum FuncLiftPattern {
     Identifier(IdentId),
-    As(FunctionLiftPatternId, IdentId),
+    As(FuncLiftPatternId, IdentId),
     StrLiteral(StringLiteralId),
     NumberLiteral(Number),
     AppliedTag {
-        tag_union_type: FunctionLiftTypeId,
+        tag_union_type: FuncLiftTypeId,
         tag_name: IdentId,
-        args: Slice<FunctionLiftPatternId>,
+        args: Slice<FuncLiftPatternId>,
     },
     StructDestructure {
-        struct_type: FunctionLiftTypeId,
-        destructs: Slice3<IdentId, FieldNameId, FunctionLiftDestructType>,
-        opt_spread: Option<(FunctionLiftTypeId, FunctionLiftPatternId)>,
+        struct_type: FuncLiftTypeId,
+        destructs: Slice3<IdentId, FieldNameId, FuncLiftDestructType>,
+        opt_spread: Option<(FuncLiftTypeId, FuncLiftPatternId)>,
     },
     List {
-        elem_type: FunctionLiftTypeId,
-        patterns: Slice<FunctionLiftPatternId>,
+        elem_type: FuncLiftTypeId,
+        patterns: Slice<FuncLiftPatternId>,
 
         /// Where a rest pattern splits patterns before and after it, if it does at all.
         /// If present, patterns at index >= the rest index appear after the rest pattern.
@@ -45,7 +45,7 @@ pub enum FunctionLiftPattern {
 }
 
 #[derive(Clone, Copy, Debug, PartialEq)]
-pub enum FunctionLiftDestructType {
+pub enum FuncLiftDestructType {
     Required,
-    Guard(FunctionLiftTypeId, FunctionLiftPatternId),
+    Guard(FuncLiftTypeId, FuncLiftPatternId),
 }

@@ -4,32 +4,32 @@ use crate::base::Number;
 use crate::env::{FieldNameId, StringLiteralId};
 use crate::soa::{Index, Slice, Slice3};
 
-use super::type_::FunctionSolveTypeId;
+use super::type_::FuncSolveTypeId;
 
 #[derive(Clone, Copy, Debug, PartialEq)]
-pub struct FunctionSolvePatternId {
-    inner: Index<FunctionSolvePattern>,
+pub struct FuncSolvePatternId {
+    inner: Index<FuncSolvePattern>,
 }
 
 #[derive(Clone, Copy, Debug, PartialEq)]
-pub enum FunctionSolvePattern {
+pub enum FuncSolvePattern {
     Identifier(IdentId),
-    As(FunctionSolvePatternId, IdentId),
+    As(FuncSolvePatternId, IdentId),
     StrLiteral(StringLiteralId),
     NumberLiteral(Number),
     AppliedTag {
-        tag_union_type: FunctionSolveTypeId,
+        tag_union_type: FuncSolveTypeId,
         tag_name: IdentId,
-        args: Slice<FunctionSolvePatternId>,
+        args: Slice<FuncSolvePatternId>,
     },
     StructDestructure {
-        struct_type: FunctionSolveTypeId,
-        destructs: Slice3<IdentId, FieldNameId, FunctionSolveDestructType>,
-        opt_spread: Option<(FunctionSolveTypeId, FunctionSolvePatternId)>,
+        struct_type: FuncSolveTypeId,
+        destructs: Slice3<IdentId, FieldNameId, FuncSolveDestructType>,
+        opt_spread: Option<(FuncSolveTypeId, FuncSolvePatternId)>,
     },
     List {
-        elem_type: FunctionSolveTypeId,
-        patterns: Slice<FunctionSolvePatternId>,
+        elem_type: FuncSolveTypeId,
+        patterns: Slice<FuncSolvePatternId>,
 
         /// Where a rest pattern splits patterns before and after it, if it does at all.
         /// If present, patterns at index >= the rest index appear after the rest pattern.
@@ -45,7 +45,7 @@ pub enum FunctionSolvePattern {
 }
 
 #[derive(Clone, Copy, Debug, PartialEq)]
-pub enum FunctionSolveDestructType {
+pub enum FuncSolveDestructType {
     Required,
-    Guard(FunctionSolveTypeId, FunctionSolvePatternId),
+    Guard(FuncSolveTypeId, FuncSolvePatternId),
 }

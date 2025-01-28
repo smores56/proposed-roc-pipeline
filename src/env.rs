@@ -3,20 +3,16 @@ use crate::{
         problem::{CompilerProblem, Problem},
         string_store::DedupedStringId,
         symbol::SymbolStore,
-        type_var::TypeVar,
     },
     soa::{Index, Slice},
 };
 
 #[derive(Default)]
 pub struct Env {
-    //     utable: UnificationTable,
-    pub variables: Vec<TypeVar>,
-    //     pub variable_slices: Vec<VariableSubsSlice>,
-    //     pub tuple_elem_indices: Vec<usize>,
-    //     pub record_fields: Vec<RecordField<()>>,
-    //     pub variable_slices: Vec<VariableSubsSlice>,
-    //     pub tag_name_cache: TagNameCache,
+    // utable: UnificationTable,
+    // pub variable_slices: Vec<VariableSubsSlice>,
+    // pub tuple_elem_indices: Vec<usize>,
+    // pub record_fields: Vec<RecordField<()>>,
     pub symbols: SymbolStore,
     // no deduping because these tend to be unique and potentially large
     string_literals: Vec<String>,
@@ -78,6 +74,7 @@ impl core::ops::Index<TagNameId> for Env {
 
 #[derive(Debug, Clone, Default)]
 pub struct TagNameCache {
+    // [Err, Ok], Red, [Ok, Err]
     tag_names: Vec<String>,
     tag_names_slices: Vec<Slice<String>>,
 }

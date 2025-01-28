@@ -1,9 +1,11 @@
 use std::collections::HashMap;
+use std::num::NonZeroU16;
 
-use expr::MonoExprId;
-use pattern::MonoPatternId;
-use type_::MonoTypeId;
+use expr::{TypeSpecExpr, TypeSpecExprId};
+use pattern::TypeSpecPatternId;
+use type_::{TypeSpecType, TypeSpecTypeId};
 
+use crate::base::region::Region;
 use crate::base::symbol::{IdentId, Symbol};
 use crate::base::type_var::TypeVar;
 use crate::base::Variable;
@@ -22,65 +24,65 @@ pub mod type_;
 // definition based on each usage found.
 //
 
+#[derive(Debug, Default)]
+pub struct TypeSpecIR {
+    entries: Vec<TypeSpecType>,
+    ids: Vec<TypeSpecTypeId>,
+    slices: Vec<(NonZeroU16, TypeSpecTypeId)>, // TODO make this a Vec2
+    // TODO convert to Vec2
+    exprs: Vec<TypeSpecExpr>,
+    expr_regions: Vec<Region>,
+}
+
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
-pub struct MonoFieldId {
+pub struct TypeSpecFieldId {
     inner: u16,
 }
 
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub struct Def {
-    pub pattern: MonoPatternId,
+    pub pattern: TypeSpecPatternId,
     /// Named variables in the pattern, e.g. `a` in `Ok a ->`
-    pub pattern_vars: Slice2<IdentId, MonoTypeId>,
-    pub expr: MonoExprId,
-    pub expr_type: MonoTypeId,
+    pub pattern_vars: Slice2<IdentId, TypeSpecTypeId>,
+    pub expr: TypeSpecExprId,
+    pub expr_type: TypeSpecTypeId,
 }
 
-/// For MonoTypes that are records, store their field indices.
-pub type RecordFieldIds = HashMap<MonoTypeId, HashMap<FieldNameId, MonoFieldId>>;
+/// For TypeSpecTypes that are records, store their field indices.
+pub type RecordFieldIds = HashMap<TypeSpecTypeId, HashMap<FieldNameId, TypeSpecFieldId>>;
 
-/// For MonoTypes that are tuples, store their element indices.
+/// For TypeSpecTypes that are tuples, store their element indices.
 /// (These are not necessarily the same as their position in the monomorphized tuple,
 /// because we may have deleted some zero-sized types in the middle - yet expressions
 /// will still refer to e.g. `tuple.1`, so we still need to know which element `.1`
 /// referred to originally before we deleted things.
-pub type TupleElemIds = HashMap<MonoTypeId, HashMap<u16, MonoFieldId>>;
+pub type TupleElemIds = HashMap<TypeSpecTypeId, HashMap<u16, TypeSpecFieldId>>;
 
 /// Variables that have already been monomorphized.
-pub struct MonoTypeCache {
-    inner: HashMap<Variable, MonoTypeId>,
+pub struct TypeSpecTypeCache {
+    inner: HashMap<Variable, TypeSpecTypeId>,
 }
 
-impl MonoTypeCache {
-    // pub fn from_solved_subs(subs: &Solved<Subs>) -> Self {
-    //     Self {
-    //         inner: HashMap::with_capacity(subs.inner().len()),
-    //     }
-    // }
-
-    /// Returns None if it monomorphizes to a type that should be eliminated
-    /// (e.g. a zero-sized type like empty record, empty tuple, a record of just those, etc.)
+impl TypeSpecTypeCache {
     pub fn monomorphize_var(
         &mut self,
-        // mono_types: &mut MonoTypes,
+        // mono_types: &mut TypeSpecTypes,
         var: TypeVar,
         env: &mut Env,
-    ) -> MonoTypeId {
+    ) -> TypeSpecTypeId {
         lower_var(var, env)
     }
 }
 
 // struct Env<'a, 'c, 'd, 'e, 'f, 'm, 'p, P> {
 //     arena: &'a Bump,
-//     cache: &'c mut MonoTypeCache,
-//     mono_types: &'m mut MonoTypes,
+//     cache: &'c mut TypeSpecTypeCache,
+//     mono_types: &'m mut TypeSpecTypes,
 //     field_ids: &'f mut RecordFieldIds,
 //     elem_ids: &'e mut TupleElemIds,
-//     problems: &'p mut P,
-//     debug_info: &'d mut Option<DebugInfo>,
 // }
 
-fn lower_builtin(_symbol: Symbol, _args: Slice<TypeVar>, _env: &mut Env) -> MonoTypeId {
+fn lower_builtin(_symbol: Symbol, _args: Slice<TypeVar>, _env: &mut Env) -> TypeSpecTypeId {
     todo!()
 }
 
@@ -90,11 +92,11 @@ pub fn monomorphize_fn<'a, 'e>(
     _arg_vars: Slice<Variable>,
     _ret_var: TypeVar,
     _env: &mut Env,
-) -> MonoTypeId {
+) -> TypeSpecTypeId {
     todo!()
 }
 
-fn lower_var(_var: TypeVar, _env: &mut Env) -> MonoTypeId {
+fn lower_var(_var: TypeVar, _env: &mut Env) -> TypeSpecTypeId {
     // let root_var = subs.get_root_key_without_compacting(var);
     // if let Some(mono_id) = self.cache.inner.get(&root_var) {
     //     return *mono_id;

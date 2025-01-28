@@ -1,8 +1,6 @@
-use std::collections::HashMap;
-
-use base::symbol::Symbol;
+use can::CanIR;
 use env::Env;
-use specialize_types::MonoTypeCache;
+use lower_ir::LoweredIR;
 
 pub mod base;
 pub mod can;
@@ -14,44 +12,7 @@ pub mod solve_functions;
 pub mod specialize_functions;
 pub mod specialize_types;
 
-// #[derive(Clone, Copy, Debug, PartialEq)]
-// pub enum Content {
-//     /// A type variable which the user did not name in an annotation,
-//     ///
-//     /// When we auto-generate a type var name, e.g. the "a" in (a -> a), we
-//     /// change the Option in here from None to Some.
-//     FlexVar(Option<SubsIndex<Lowercase>>),
-//     /// name given in a user-written annotation
-//     RigidVar(SubsIndex<Lowercase>),
-//     // /// Like a [Self::FlexVar], but is also bound to 1+ abilities.
-//     // /// This can only happen when unified with a [Self::RigidAbleVar].
-//     // FlexAbleVar(Option<SubsIndex<Lowercase>>, SubsSlice<Symbol>),
-//     // /// Like a [Self::RigidVar], but is also bound to 1+ abilities.
-//     // /// For example, "a implements Hash".
-//     // RigidAbleVar(SubsIndex<Lowercase>, SubsSlice<Symbol>),
-//     /// name given to a recursion variable
-//     RecursionVar {
-//         structure: Variable,
-//         opt_name: Option<SubsIndex<Lowercase>>,
-//     },
-//     Structure(FlatType),
-//     Alias(Symbol, AliasVariables, Variable, AliasKind),
-//     RangedNumber(crate::num::NumericRange),
-//     Error,
-//     /// The fx type variable for a given function
-//     Pure,
-//     Effectful,
-// }
-
-//
-
-pub struct CanVariable(u32);
-
-pub struct TypecheckingIr {
-    vars: Vec<CanVariable>,
-}
-
-fn pipe_ir_from_typechecking_to_codegen(typechecking_ir: TypecheckingIr, env: Env) -> CodegenIr {
+fn pipe_ir_from_typechecking_to_codegen(typecheck_ir: CanIR, env: Env) -> LoweredIR {
     // steps for the whole dang compiler (check and run):
     // in common:
     // - read the header of the passed module:

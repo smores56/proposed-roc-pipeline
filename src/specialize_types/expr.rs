@@ -1,66 +1,40 @@
 use core::mem::MaybeUninit;
 
-use crate::base::foreign_symbol::ForeignSymbolId;
-use crate::base::low_level::LowLevel;
 use crate::base::problem::SpecializeTypesProblem;
-use crate::base::region::Region;
 use crate::base::symbol::IdentId;
 use crate::base::{Number, Recursive};
 use crate::env::{FieldNameId, StringLiteralId};
 use crate::soa::{Index, NonEmptySlice, Slice, Slice2};
 
-use super::pattern::MonoPatternId;
-use super::type_::MonoTypeId;
-
-#[derive(Debug, Default)]
-pub struct MonoExprs {
-    // TODO convert to Vec2
-    exprs: Vec<MonoExpr>,
-    regions: Vec<Region>,
-}
+use super::pattern::TypeSpecPatternId;
+use super::type_::TypeSpecTypeId;
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
-pub struct MonoExprId {
-    inner: Index<MonoExpr>,
-}
+pub struct TypeSpecExprId(Index<TypeSpecExpr>);
 
 #[derive(Clone, Debug, PartialEq)]
-pub enum MonoExpr {
+pub enum TypeSpecExpr {
     Str(StringLiteralId),
     Number(Number),
     List {
-        elem_type: MonoTypeId,
-        elems: Slice<MonoExprId>,
+        elem_type: TypeSpecTypeId,
+        elems: Slice<TypeSpecExprId>,
     },
-    Lookup(IdentId, MonoTypeId),
+    Lookup(IdentId, TypeSpecTypeId),
 
     /// This is *only* for calling functions, not for tag application.
     /// The Tag variant contains any applied values inside it.
     Call {
-        fn_type: MonoTypeId,
-        fn_expr: MonoExprId,
-        args: Slice2<MonoTypeId, MonoExprId>,
-        /// This is the type of the closure based only on canonical IR info,
-        /// not considering what other closures might later influence it.
-        /// Lambda set specialization may change this type later!
-        capture_type: MonoTypeId,
-    },
-    RunLowLevel {
-        op: LowLevel,
-        args: Slice<(MonoTypeId, MonoExprId)>,
-        ret_type: MonoTypeId,
-    },
-    ForeignCall {
-        foreign_symbol: ForeignSymbolId,
-        args: Slice<(MonoTypeId, MonoExprId)>,
-        ret_type: MonoTypeId,
+        fn_type: TypeSpecTypeId,
+        fn_expr: TypeSpecExprId,
+        args: Slice2<TypeSpecTypeId, TypeSpecExprId>,
     },
 
     Lambda {
-        fn_type: MonoTypeId,
-        arguments: Slice<(MonoTypeId, MonoPatternId)>,
-        body: MonoExprId,
-        captured_symbols: Slice<(IdentId, MonoTypeId)>,
+        fn_type: TypeSpecTypeId,
+        arguments: Slice<(TypeSpecTypeId, TypeSpecPatternId)>,
+        body: TypeSpecExprId,
+        captured_symbols: Slice<(IdentId, TypeSpecTypeId)>,
         recursive: Recursive,
     },
 
@@ -68,7 +42,7 @@ pub enum MonoExpr {
 
     /// A record literal or a tuple literal.
     /// These have already been sorted alphabetically.
-    Struct(NonEmptySlice<MonoExpr>),
+    Struct(NonEmptySlice<TypeSpecExpr>),
 
     /// Look up exactly one field on a record, tuple, or tag payload.
     /// At this point we've already unified those concepts and have
@@ -79,50 +53,44 @@ pub enum MonoExpr {
     /// by alignment and converted to byte offsets, but we in this
     /// phase we aren't concerned with alignment or sizes, just indices.
     StructAccess {
-        record_expr: MonoExprId,
-        record_type: MonoTypeId,
-        field_type: MonoTypeId,
+        record_expr: TypeSpecExprId,
+        record_type: TypeSpecTypeId,
+        field_type: TypeSpecTypeId,
         field_id: FieldNameId,
-    },
-
-    RecordUpdate {
-        record_type: MonoTypeId,
-        record_name: IdentId,
-        updates: Slice2<FieldNameId, MonoExprId>,
     },
 
     /// Same as SmallTag but with u16 discriminant instead of u8
     Tag {
         discriminant: u16,
-        tag_union_type: MonoTypeId,
-        args: Slice2<MonoTypeId, MonoExprId>,
+        tag_union_type: TypeSpecTypeId,
+        args: Slice2<TypeSpecTypeId, TypeSpecExprId>,
     },
 
     When {
         /// The value being matched on
-        value: MonoExprId,
+        value: TypeSpecExprId,
         /// The type of the value being matched on
-        value_type: MonoTypeId,
+        value_type: TypeSpecTypeId,
         /// The return type of all branches and thus the whole when expression
-        branch_type: MonoTypeId,
+        branch_type: TypeSpecTypeId,
         /// The branches of the when expression
-        branches: NonEmptySlice<WhenBranch>,
+        branches: NonEmptySlice<TypeSpecWhenBranch>,
     },
 
     CompilerBug(SpecializeTypesProblem),
 }
 
 #[derive(Clone, Copy, Debug, PartialEq)]
-pub struct WhenBranch {
+pub struct TypeSpecWhenBranch {
     /// The pattern(s) to match the value against
-    pub patterns: NonEmptySlice<MonoPatternId>,
+    pub patterns: NonEmptySlice<TypeSpecPatternId>,
     /// A boolean expression that must be true for this branch to be taken
-    pub guard: Option<MonoExprId>,
+    pub guard: Option<TypeSpecExprId>,
     /// The expression to produce if the pattern matches
-    pub value: MonoExprId,
+    pub value: TypeSpecExprId,
 }
 
 #[derive(Debug, Default)]
-pub struct WhenBranches {
-    branches: Vec<MaybeUninit<WhenBranch>>,
+pub struct TypeSpecWhenBranches {
+    branches: Vec<MaybeUninit<TypeSpecWhenBranch>>,
 }

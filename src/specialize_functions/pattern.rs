@@ -4,32 +4,32 @@ use crate::base::Number;
 use crate::env::{FieldNameId, StringLiteralId};
 use crate::soa::{Index, Slice, Slice3};
 
-use super::type_::FunctionSpecializeTypeId;
+use super::type_::FuncSpecTypeId;
 
 #[derive(Clone, Copy, Debug, PartialEq)]
-pub struct FunctionSpecializePatternId {
-    inner: Index<FunctionSpecializePattern>,
+pub struct FuncSpecPatternId {
+    inner: Index<FuncSpecPattern>,
 }
 
 #[derive(Clone, Copy, Debug, PartialEq)]
-pub enum FunctionSpecializePattern {
+pub enum FuncSpecPattern {
     Identifier(IdentId),
-    As(FunctionSpecializePatternId, IdentId),
+    As(FuncSpecPatternId, IdentId),
     StrLiteral(StringLiteralId),
     NumberLiteral(Number),
     AppliedTag {
-        tag_union_type: FunctionSpecializeTypeId,
+        tag_union_type: FuncSpecTypeId,
         tag_name: IdentId,
-        args: Slice<FunctionSpecializePatternId>,
+        args: Slice<FuncSpecPatternId>,
     },
     StructDestructure {
-        struct_type: FunctionSpecializeTypeId,
-        destructs: Slice3<IdentId, FieldNameId, FunctionSpecializeDestructType>,
-        opt_spread: Option<(FunctionSpecializeTypeId, FunctionSpecializePatternId)>,
+        struct_type: FuncSpecTypeId,
+        destructs: Slice3<IdentId, FieldNameId, FuncSpecDestructType>,
+        opt_spread: Option<(FuncSpecTypeId, FuncSpecPatternId)>,
     },
     List {
-        elem_type: FunctionSpecializeTypeId,
-        patterns: Slice<FunctionSpecializePatternId>,
+        elem_type: FuncSpecTypeId,
+        patterns: Slice<FuncSpecPatternId>,
 
         /// Where a rest pattern splits patterns before and after it, if it does at all.
         /// If present, patterns at index >= the rest index appear after the rest pattern.
@@ -45,7 +45,7 @@ pub enum FunctionSpecializePattern {
 }
 
 #[derive(Clone, Copy, Debug, PartialEq)]
-pub enum FunctionSpecializeDestructType {
+pub enum FuncSpecDestructType {
     Required,
-    Guard(FunctionSpecializeTypeId, FunctionSpecializePatternId),
+    Guard(FuncSpecTypeId, FuncSpecPatternId),
 }

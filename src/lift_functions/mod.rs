@@ -2,18 +2,18 @@ pub mod expr;
 pub mod pattern;
 pub mod type_;
 
-use expr::FunctionLiftExpr;
-use pattern::FunctionLiftPattern;
-use type_::FunctionLiftType;
+use expr::FuncLiftExpr;
+use pattern::FuncLiftPattern;
+use type_::FuncLiftType;
 
 use crate::base::region::Region;
 
 #[derive(Default)]
-pub struct FunctionLiftData {
-    exprs: Vec<FunctionLiftExpr>,
+pub struct FuncLiftIR {
+    exprs: Vec<FuncLiftExpr>,
     expr_regions: Vec<Region>,
-    patterns: Vec<FunctionLiftPattern>,
+    patterns: Vec<FuncLiftPattern>,
     // pattern_regions: Vec<Region>,
-    types: Vec<FunctionLiftType>,
+    types: Vec<FuncLiftType>,
     // type_regions: Vec<Region>,
 }

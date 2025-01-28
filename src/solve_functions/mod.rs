@@ -2,18 +2,18 @@ pub mod expr;
 pub mod pattern;
 pub mod type_;
 
-use expr::FunctionSolveExpr;
-use pattern::FunctionSolvePattern;
-use type_::FunctionSolveType;
+use expr::FuncSolveExpr;
+use pattern::FuncSolvePattern;
+use type_::FuncSolveType;
 
 use crate::base::region::Region;
 
 #[derive(Default)]
-pub struct FunctionSolveData {
-    exprs: Vec<FunctionSolveExpr>,
+pub struct FuncSolveIR {
+    exprs: Vec<FuncSolveExpr>,
     expr_regions: Vec<Region>,
-    patterns: Vec<FunctionSolvePattern>,
+    patterns: Vec<FuncSolvePattern>,
     // pattern_regions: Vec<Region>,
-    types: Vec<FunctionSolveType>,
+    types: Vec<FuncSolveType>,
     // type_regions: Vec<Region>,
 }

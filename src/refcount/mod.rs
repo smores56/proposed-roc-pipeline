@@ -12,7 +12,7 @@ pub mod expr;
 pub mod layout;
 pub mod stmt;
 
-pub struct LoweredIR {
+pub struct LoweredIrData {
     procs: HashMap<Symbol, LoweredFunctionData>,
     // values: Vec<ConcreteExpr>,
     layouts: Vec<LoweredLayout>,

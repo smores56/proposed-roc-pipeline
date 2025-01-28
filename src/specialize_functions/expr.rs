@@ -1,52 +1,40 @@
 use core::mem::MaybeUninit;
 
-use crate::base::foreign_symbol::ForeignSymbolId;
-use crate::base::low_level::LowLevelId;
-use crate::base::problem::FunctionSpecializeProblem;
+use crate::base::problem::SpecializeFunctionsProblem;
 use crate::base::symbol::{IdentId, Symbol};
 use crate::base::Number;
 use crate::env::{FieldNameId, StringLiteralId};
 use crate::soa::{Index, NonEmptySlice, Slice, Slice2};
 
-use super::pattern::FunctionSpecializePatternId;
-use super::type_::FunctionSpecializeTypeId;
+use super::pattern::FuncSpecPatternId;
+use super::type_::FuncSpecTypeId;
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
-pub struct FunctionSpecializeExprId {
-    index: Index<FunctionSpecializeExpr>,
+pub struct FuncSpecExprId {
+    index: Index<FuncSpecExpr>,
 }
 
 #[derive(Clone, Copy, Debug, PartialEq)]
-pub enum FunctionSpecializeExpr {
+pub enum FuncSpecExpr {
     Str(StringLiteralId),
     Number(Number),
     List {
-        elem_type: FunctionSpecializeTypeId,
-        elems: Slice<FunctionSpecializeExprId>,
+        elem_type: FuncSpecTypeId,
+        elems: Slice<FuncSpecExprId>,
     },
-    Lookup(IdentId, FunctionSpecializeTypeId),
+    Lookup(IdentId, FuncSpecTypeId),
 
     /// This is *only* for calling functions, not for tag application.
     /// The Tag variant contains any applied values inside it.
     Call {
-        fn_type: FunctionSpecializeTypeId,
+        fn_type: FuncSpecTypeId,
         fn_symbol: Symbol,
-        args: Slice2<FunctionSpecializeTypeId, FunctionSpecializeExprId>,
-    },
-    RunLowLevel {
-        op: LowLevelId,
-        args: Slice<(FunctionSpecializeTypeId, FunctionSpecializeExprId)>,
-        ret_type: FunctionSpecializeTypeId,
-    },
-    ForeignCall {
-        foreign_symbol: ForeignSymbolId,
-        args: Slice<(FunctionSpecializeTypeId, FunctionSpecializeExprId)>,
-        ret_type: FunctionSpecializeTypeId,
+        args: Slice2<FuncSpecTypeId, FuncSpecExprId>,
     },
 
     Unit,
 
-    Struct(NonEmptySlice<FunctionSpecializeExpr>),
+    Struct(NonEmptySlice<FuncSpecExpr>),
 
     /// Look up exactly one field on a record, tuple, or tag payload.
     /// At this point we've already unified those concepts and have
@@ -57,49 +45,43 @@ pub enum FunctionSpecializeExpr {
     /// by alignment and converted to byte offsets, but we in this
     /// phase we aren't concerned with alignment or sizes, just indices.
     StructAccess {
-        record_expr: FunctionSpecializeExprId,
-        record_type: FunctionSpecializeTypeId,
-        field_type: FunctionSpecializeTypeId,
+        record_expr: FuncSpecExprId,
+        record_type: FuncSpecTypeId,
+        field_type: FuncSpecTypeId,
         field_id: FieldNameId,
-    },
-
-    RecordUpdate {
-        record_type: FunctionSpecializeTypeId,
-        record_name: IdentId,
-        updates: Slice2<FieldNameId, FunctionSpecializeExprId>,
     },
 
     Tag {
         discriminant: u16,
-        tag_union_type: FunctionSpecializeTypeId,
-        args: Slice2<FunctionSpecializeTypeId, FunctionSpecializeExprId>,
+        tag_union_type: FuncSpecTypeId,
+        args: Slice2<FuncSpecTypeId, FuncSpecExprId>,
     },
 
     When {
         /// The value being matched on
-        value: FunctionSpecializeExprId,
+        value: FuncSpecExprId,
         /// The type of the value being matched on
-        value_type: FunctionSpecializeTypeId,
+        value_type: FuncSpecTypeId,
         /// The return type of all branches and thus the whole when expression
-        branch_type: FunctionSpecializeTypeId,
+        branch_type: FuncSpecTypeId,
         /// The branches of the when expression
-        branches: NonEmptySlice<WhenBranch>,
+        branches: NonEmptySlice<FuncSpecWhenBranch>,
     },
 
-    CompilerBug(FunctionSpecializeProblem),
+    CompilerBug(SpecializeFunctionsProblem),
 }
 
 #[derive(Clone, Copy, Debug, PartialEq)]
-pub struct WhenBranch {
+pub struct FuncSpecWhenBranch {
     /// The pattern(s) to match the value against
-    pub patterns: NonEmptySlice<FunctionSpecializePatternId>,
+    pub patterns: NonEmptySlice<FuncSpecPatternId>,
     /// A boolean expression that must be true for this branch to be taken
-    pub guard: Option<FunctionSpecializeExprId>,
+    pub guard: Option<FuncSpecExprId>,
     /// The expression to produce if the pattern matches
-    pub value: FunctionSpecializeExprId,
+    pub value: FuncSpecExprId,
 }
 
 #[derive(Debug, Default)]
-pub struct WhenBranches {
-    branches: Vec<MaybeUninit<WhenBranch>>,
+pub struct FuncSpecWhenBranches {
+    branches: Vec<MaybeUninit<FuncSpecWhenBranch>>,
 }

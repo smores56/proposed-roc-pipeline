@@ -4,20 +4,20 @@ use crate::{
 };
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
-pub struct FunctionSolveTypeId {
-    index: Index<FunctionSolveType>,
+pub struct FuncSolveTypeId {
+    index: Index<FuncSolveType>,
 }
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
-pub enum FunctionSolveType {
+pub enum FuncSolveType {
     Primitive(Primitive),
-    Box(FunctionSolveTypeId),
-    List(FunctionSolveTypeId),
-    Struct(NonEmptySlice<FunctionSolveTypeId>),
-    TagUnion(NonEmptySlice<FunctionSolveTypeId>),
+    Box(FuncSolveTypeId),
+    List(FuncSolveTypeId),
+    Struct(NonEmptySlice<FuncSolveTypeId>),
+    TagUnion(NonEmptySlice<FuncSolveTypeId>),
     // TODO: can this go somewhere outside of the main function union?
     FunctionPack {
         /// zero fields means no captures
-        opt_fields: Slice<FunctionSolveTypeId>,
+        opt_fields: Slice<FuncSolveTypeId>,
     },
 }
