@@ -2,7 +2,7 @@ use core::mem::MaybeUninit;
 
 use crate::base::problem::SpecializeTypesProblem;
 use crate::base::symbol::IdentId;
-use crate::base::{Number, Recursive};
+use crate::base::{NumberLiteral, Recursive};
 use crate::env::{FieldNameId, StringLiteralId};
 use crate::soa::{Index, NonEmptySlice, Slice, Slice2};
 
@@ -16,7 +16,7 @@ pub struct TypeSpecExprId(pub(crate) Index<TypeSpecExpr>);
 pub enum TypeSpecExpr {
     Let(TypeSpecDef),
     Str(StringLiteralId),
-    Number(Number),
+    Number(NumberLiteral),
     List {
         elem_type: TypeSpecTypeId,
         elems: Slice<TypeSpecExprId>,

@@ -1,6 +1,6 @@
 use crate::base::problem::SpecializeTypesProblem;
 use crate::base::symbol::IdentId;
-use crate::base::Number;
+use crate::base::NumberLiteral;
 use crate::env::StringLiteralId;
 use crate::soa::{Index, Slice, Slice3};
 
@@ -15,7 +15,7 @@ pub enum TypeSpecPattern {
     Identifier(IdentId),
     As(TypeSpecPatternId, IdentId),
     StrLiteral(StringLiteralId),
-    NumberLiteral(Number),
+    NumberLiteral(NumberLiteral),
     AppliedTag {
         tag_union_type: TypeSpecTypeId,
         tag_name: IdentId,

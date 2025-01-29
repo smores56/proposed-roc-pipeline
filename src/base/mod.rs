@@ -27,7 +27,7 @@ pub enum Primitive {
 }
 
 #[derive(Clone, Copy, Debug, PartialEq)]
-pub enum Number {
+pub enum NumberLiteral {
     I8(i8),
     U8(u8),
     I16(i16),

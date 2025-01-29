@@ -1,5 +1,5 @@
 use crate::{
-    base::{foreign_symbol::ForeignSymbolId, symbol::Symbol, LowLevel, Number},
+    base::{foreign_symbol::ForeignSymbolId, symbol::Symbol, LowLevel, NumberLiteral},
     env::StringLiteralId,
     soa::{Index, NonEmptySlice, Slice},
 };
@@ -12,7 +12,7 @@ pub struct LowerExprId(pub(crate) Index<LowerExpr>);
 #[derive(Debug)]
 pub enum LowerExpr {
     Str(StringLiteralId),
-    Number(Number),
+    Number(NumberLiteral),
 
     // Functions
     Call(LowerCall),
@@ -79,7 +79,7 @@ pub enum LowerExpr {
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub enum ListLiteralElem {
     Str(StringLiteralId),
-    Number(Number),
+    Number(NumberLiteral),
     Symbol(Symbol),
 }
 

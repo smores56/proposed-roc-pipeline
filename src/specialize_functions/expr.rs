@@ -2,7 +2,7 @@ use core::mem::MaybeUninit;
 
 use crate::base::problem::SpecializeFunctionsProblem;
 use crate::base::symbol::{IdentId, Symbol};
-use crate::base::Number;
+use crate::base::NumberLiteral;
 use crate::env::{FieldNameId, StringLiteralId};
 use crate::soa::{Index, NonEmptySlice, Slice, Slice2};
 
@@ -16,7 +16,7 @@ pub struct FuncSpecExprId(pub(crate) Index<FuncSpecExpr>);
 pub enum FuncSpecExpr {
     Let(FuncSpecDef),
     Str(StringLiteralId),
-    Number(Number),
+    Number(NumberLiteral),
     List {
         elem_type: FuncSpecTypeId,
         elems: Slice<FuncSpecExprId>,

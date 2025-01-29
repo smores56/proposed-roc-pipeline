@@ -2,7 +2,7 @@ use core::mem::MaybeUninit;
 
 use crate::base::problem::SolveFunctionsProblem;
 use crate::base::symbol::{IdentId, Symbol};
-use crate::base::Number;
+use crate::base::NumberLiteral;
 use crate::env::{FieldNameId, StringLiteralId};
 use crate::soa::{Index, NonEmptySlice, Slice, Slice2};
 
@@ -16,7 +16,7 @@ pub struct FuncSolveExprId(pub(crate) Index<FuncSolveExpr>);
 pub enum FuncSolveExpr {
     Let(FuncSolveDef),
     Str(StringLiteralId),
-    Number(Number),
+    Number(NumberLiteral),
     List {
         elem_type: FuncSolveTypeId,
         elems: Slice<FuncSolveExprId>,

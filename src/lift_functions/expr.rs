@@ -2,7 +2,7 @@ use core::mem::MaybeUninit;
 
 use crate::base::problem::LiftFunctionsProblem;
 use crate::base::symbol::{IdentId, Symbol};
-use crate::base::Number;
+use crate::base::NumberLiteral;
 use crate::env::{FieldNameId, StringLiteralId};
 use crate::soa::{Index, NonEmptySlice, Slice, Slice2};
 
@@ -16,7 +16,7 @@ pub struct FuncLiftExprId(pub(crate) Index<FuncLiftExpr>);
 pub enum FuncLiftExpr {
     Let(FuncLiftDef),
     Str(StringLiteralId),
-    Number(Number),
+    Number(NumberLiteral),
     List {
         elem_type: FuncLiftTypeId,
         elems: Slice<FuncLiftExprId>,

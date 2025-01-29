@@ -1,6 +1,6 @@
 use crate::base::problem::SpecializeTypesProblem;
 use crate::base::symbol::IdentId;
-use crate::base::Number;
+use crate::base::NumberLiteral;
 use crate::env::{FieldNameId, StringLiteralId};
 use crate::soa::{Index, Slice, Slice3};
 
@@ -14,7 +14,7 @@ pub enum FuncSolvePattern {
     Identifier(IdentId),
     As(FuncSolvePatternId, IdentId),
     StrLiteral(StringLiteralId),
-    NumberLiteral(Number),
+    NumberLiteral(NumberLiteral),
     AppliedTag {
         tag_union_type: FuncSolveTypeId,
         tag_name: IdentId,
