@@ -14,6 +14,7 @@ pub struct FuncLiftExprId(pub(crate) Index<FuncLiftExpr>);
 
 #[derive(Debug, Clone, PartialEq)]
 pub enum FuncLiftExpr {
+    Let(FuncLiftDef),
     Str(StringLiteralId),
     Number(Number),
     List {
@@ -72,6 +73,15 @@ pub enum FuncLiftExpr {
     },
 
     CompilerBug(LiftFunctionsProblem),
+}
+
+#[derive(Clone, Copy, Debug, PartialEq)]
+pub struct FuncLiftDef {
+    pub pattern: FuncLiftPatternId,
+    /// Named variables in the pattern, e.g. `a` in `Ok a ->`
+    pub pattern_vars: Slice2<IdentId, FuncLiftTypeId>,
+    pub expr: FuncLiftExprId,
+    pub expr_type: FuncLiftTypeId,
 }
 
 #[derive(Clone, Copy, Debug, PartialEq)]

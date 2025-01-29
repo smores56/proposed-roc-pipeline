@@ -14,6 +14,7 @@ pub struct FuncSpecExprId(pub(crate) Index<FuncSpecExpr>);
 
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub enum FuncSpecExpr {
+    Let(FuncSpecDef),
     Str(StringLiteralId),
     Number(Number),
     List {
@@ -67,6 +68,15 @@ pub enum FuncSpecExpr {
     },
 
     CompilerBug(SpecializeFunctionsProblem),
+}
+
+#[derive(Clone, Copy, Debug, PartialEq)]
+pub struct FuncSpecDef {
+    pub pattern: FuncSpecPatternId,
+    /// Named variables in the pattern, e.g. `a` in `Ok a ->`
+    pub pattern_vars: Slice2<IdentId, FuncSpecTypeId>,
+    pub expr: FuncSpecExprId,
+    pub expr_type: FuncSpecTypeId,
 }
 
 #[derive(Clone, Copy, Debug, PartialEq)]

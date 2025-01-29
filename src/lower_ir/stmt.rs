@@ -22,6 +22,7 @@ pub enum RefCountStmt {
     Switch {
         /// This *must* stand for an integer, because Switch potentially compiles to a jump table.
         cond_symbol: Symbol,
+        // TODO: can we make this layout a number type?
         cond_layout: LowerLayoutId,
         /// The u64 in the tuple will be compared directly to the condition Expr.
         /// If they are equal, this branch will be taken.
@@ -35,7 +36,7 @@ pub enum RefCountStmt {
     /// a join point `join f <params> = <continuation> in remainder`
     Join {
         id: JoinPointId,
-        parameters: Slice<Param>,
+        parameters: Slice<LowerParam>,
         /// body of the join point
         /// what happens after _jumping to_ the join point
         body: LowerStmtId,
@@ -59,9 +60,8 @@ pub enum CrashTag {
     User = 1,
 }
 
-// TODO: rename
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
-pub struct Param {
+pub struct LowerParam {
     pub symbol: Symbol,
     pub layout: LowerLayoutId,
 }

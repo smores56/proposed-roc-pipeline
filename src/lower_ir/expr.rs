@@ -7,7 +7,7 @@ use crate::{
 use super::layout::{LowerLayoutId, TagIdIntType, UnionLayout};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub struct LowerExprId(Index<LowerExpr>);
+pub struct LowerExprId(pub(crate) Index<LowerExpr>);
 
 #[derive(Debug)]
 pub enum LowerExpr {

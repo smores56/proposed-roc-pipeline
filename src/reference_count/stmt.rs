@@ -3,12 +3,10 @@ use crate::{
     lower_ir::{
         expr::LowerExprId,
         layout::LowerLayoutId,
-        stmt::{CrashTag, JoinPointId, Param},
+        stmt::{CrashTag, JoinPointId, LowerBranchInfo, LowerParam},
     },
     soa::{Index, Slice},
 };
-
-pub type TagIdIntType = u16;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct RefCountStmtId {
@@ -26,12 +24,13 @@ pub enum RefCountStmt {
     Switch {
         /// This *must* stand for an integer, because Switch potentially compiles to a jump table.
         cond_symbol: Symbol,
+        // TODO: can we make this a number type?
         cond_layout: LowerLayoutId,
         /// The u64 in the tuple will be compared directly to the condition Expr.
         /// If they are equal, this branch will be taken.
-        branches: Slice<(u64, RefCountBranchInfo, RefCountStmtId)>,
+        branches: Slice<(u64, LowerBranchInfo, RefCountStmtId)>,
         /// If no other branches pass, this default branch will be taken.
-        default_branch: (RefCountBranchInfo, RefCountStmtId),
+        default_branch: (LowerBranchInfo, RefCountStmtId),
         /// Each branch must return a value of this type.
         ret_layout: LowerLayoutId,
     },
@@ -43,7 +42,7 @@ pub enum RefCountStmt {
     /// a join point `join f <params> = <continuation> in remainder`
     Join {
         id: JoinPointId,
-        parameters: Slice<Param>,
+        parameters: Slice<LowerParam>,
         /// body of the join point
         /// what happens after _jumping to_ the join point
         body: RefCountStmtId,
@@ -52,25 +51,6 @@ pub enum RefCountStmt {
     },
     Jump(JoinPointId, Slice<Symbol>),
     Crash(Symbol, CrashTag),
-}
-
-/// in the block below, symbol `scrutinee` is assumed be be of shape `tag_id`
-#[derive(Clone, Debug, PartialEq, Eq)]
-pub enum RefCountBranchInfo {
-    None,
-    Constructor {
-        scrutinee: Symbol,
-        layout: LowerLayoutId,
-        tag_id: TagIdIntType,
-    },
-    List {
-        scrutinee: Symbol,
-        len: u64,
-    },
-    Unique {
-        scrutinee: Symbol,
-        unique: bool,
-    },
 }
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]

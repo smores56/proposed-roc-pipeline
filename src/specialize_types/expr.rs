@@ -14,6 +14,7 @@ pub struct TypeSpecExprId(pub(crate) Index<TypeSpecExpr>);
 
 #[derive(Clone, Debug, PartialEq)]
 pub enum TypeSpecExpr {
+    Let(TypeSpecDef),
     Str(StringLiteralId),
     Number(Number),
     List {
@@ -78,6 +79,15 @@ pub enum TypeSpecExpr {
     },
 
     CompilerBug(SpecializeTypesProblem),
+}
+
+#[derive(Clone, Copy, Debug, PartialEq)]
+pub struct TypeSpecDef {
+    pub pattern: TypeSpecPatternId,
+    /// Named variables in the pattern, e.g. `a` in `Ok a ->`
+    pub pattern_vars: Slice2<IdentId, TypeSpecTypeId>,
+    pub expr: TypeSpecExprId,
+    pub expr_type: TypeSpecTypeId,
 }
 
 #[derive(Clone, Copy, Debug, PartialEq)]

@@ -14,6 +14,7 @@ pub struct FuncSolveExprId(pub(crate) Index<FuncSolveExpr>);
 
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub enum FuncSolveExpr {
+    Let(FuncSolveDef),
     Str(StringLiteralId),
     Number(Number),
     List {
@@ -72,6 +73,15 @@ pub enum FuncSolveExpr {
     },
 
     CompilerBug(SolveFunctionsProblem),
+}
+
+#[derive(Clone, Copy, Debug, PartialEq)]
+pub struct FuncSolveDef {
+    pub pattern: FuncSolvePatternId,
+    /// Named variables in the pattern, e.g. `a` in `Ok a ->`
+    pub pattern_vars: Slice2<IdentId, FuncSolveTypeId>,
+    pub expr: FuncSolveExprId,
+    pub expr_type: FuncSolveTypeId,
 }
 
 #[derive(Clone, Copy, Debug, PartialEq)]

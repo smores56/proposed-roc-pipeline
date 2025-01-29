@@ -20,8 +20,8 @@ pub mod type_;
 // by walking the program starting from the program's entry point and make a copy of every
 // definition based on each usage found.
 //
-// This is has been partially implemented already by Agus in the compiler:
-// https://github.com/roc-lang/roc/tree/main/crates/build/specialize_types
+// This is has been partially implemented already by Agus in the compiler repo:
+// https://github.com/roc-lang/roc/blob/689c58f35e0a39ca59feba549f7fcf375562a7a6/crates/build/specialize_types/src/expr.rs#L19
 //
 // Design by Ayaz for this stage:
 // https://github.com/roc-lang/rfcs/blob/ayaz/compile-with-lambda-sets/0102-compiling-lambda-sets.md#type_specialize
@@ -64,19 +64,12 @@ impl core::ops::Index<TypeSpecTypeId> for TypeSpecIR {
     }
 }
 
-#[derive(Clone, Copy, Debug, PartialEq, Eq)]
-pub struct TypeSpecFieldId {
-    inner: u16,
+/// Variables that have already been monomorphized.
+pub struct TypeSpecTypeCache {
+    types_by_var: HashMap<TypeVar, TypeSpecTypeId>,
 }
 
-#[derive(Clone, Copy, Debug, PartialEq)]
-pub struct Def {
-    pub pattern: TypeSpecPatternId,
-    /// Named variables in the pattern, e.g. `a` in `Ok a ->`
-    pub pattern_vars: Slice2<IdentId, TypeSpecTypeId>,
-    pub expr: TypeSpecExprId,
-    pub expr_type: TypeSpecTypeId,
-}
+// TODO: are the below types necessary?
 
 /// For TypeSpecTypes that are records, store their field indices.
 pub type RecordFieldIds = HashMap<TypeSpecTypeId, HashMap<FieldNameId, TypeSpecFieldId>>;
@@ -88,7 +81,7 @@ pub type RecordFieldIds = HashMap<TypeSpecTypeId, HashMap<FieldNameId, TypeSpecF
 /// referred to originally before we deleted things.
 pub type TupleElemIds = HashMap<TypeSpecTypeId, HashMap<u16, TypeSpecFieldId>>;
 
-/// Variables that have already been monomorphized.
-pub struct TypeSpecTypeCache {
-    types_by_var: HashMap<TypeVar, TypeSpecTypeId>,
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub struct TypeSpecFieldId {
+    inner: u16,
 }
