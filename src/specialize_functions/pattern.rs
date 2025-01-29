@@ -9,7 +9,7 @@ use super::type_::FuncSpecTypeId;
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub struct FuncSpecPatternId(pub(crate) Index<FuncSpecPattern>);
 
-#[derive(Clone, Copy, Debug, PartialEq)]
+#[derive(Clone, Debug, PartialEq)]
 pub enum FuncSpecPattern {
     Identifier(IdentId),
     As(FuncSpecPatternId, IdentId),

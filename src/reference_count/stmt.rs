@@ -11,6 +11,9 @@ use crate::{
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct RefCountStmtId(pub(crate) Index<RefCountStmt>);
 
+// TODO: should `LowerExpr` or `RefCountStmt` hold the CompilerBug(ReferenceCountProblem)?
+
+// the same as `LowerStmt`, but with an added `RefCount` variant
 #[derive(Debug, Clone, PartialEq)]
 pub enum RefCountStmt {
     Let {

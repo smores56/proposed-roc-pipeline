@@ -10,7 +10,7 @@ use super::TypeSpecFieldId;
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub struct TypeSpecPatternId(pub(crate) Index<TypeSpecPattern>);
 
-#[derive(Clone, Copy, Debug, PartialEq)]
+#[derive(Clone, Debug, PartialEq)]
 pub enum TypeSpecPattern {
     Identifier(IdentId),
     As(TypeSpecPatternId, IdentId),

@@ -9,7 +9,7 @@ use crate::{
 
 /// An environment containing indexable data useful throughout most or all stages
 /// in the new compiler pipeline.
-#[derive(Default)]
+#[derive(Debug, Default)]
 pub struct Env {
     pub symbols: SymbolStore,
     // no deduping because these tend to be unique and potentially large

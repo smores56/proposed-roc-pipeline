@@ -9,7 +9,7 @@ use super::type_::FuncLiftTypeId;
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub struct FuncLiftPatternId(pub(crate) Index<FuncLiftPattern>);
 
-#[derive(Clone, Copy, Debug, PartialEq)]
+#[derive(Clone, Debug, PartialEq)]
 pub enum FuncLiftPattern {
     Identifier(IdentId),
     As(FuncLiftPatternId, IdentId),

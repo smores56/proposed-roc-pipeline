@@ -62,8 +62,7 @@ pub struct ResolveIR {
     pub declarations: Vec<DeclarationTag>,
 
     // utable: UnificationTable,
-    // pub variable_slices: Vec<VariableSubsSlice>,
-    /// same lengths as declarations; has a dummy value if not applicable
+    // pub type_var_slices: Vec<TypeVarSubsSlice>,
     pub type_vars: Vec<TypeVar>,
     pub symbols: Vec<Symbol>,
     pub symbol_regions: Vec<Region>,

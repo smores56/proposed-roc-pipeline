@@ -21,9 +21,10 @@ pub enum LowerLayout {
     Unit,
 }
 
-// TODO: give link to place we copied this (and other copied entities) from
-//
 // TODO: should these use `NonEmptySlice`s?
+//
+// Copied (and adapted) from:
+// https://github.com/roc-lang/roc/blob/689c58f35e0a39ca59feba549f7fcf375562a7a6/crates/compiler/mono/src/layout.rs#L733
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum UnionLayout {
     /// A non-recursive tag union

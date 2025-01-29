@@ -1,3 +1,8 @@
+//! A set of types for interacting with struct-of-arrays collections.
+//!
+//! Copied from:
+//! https://github.com/roc-lang/roc/blob/689c58f35e0a39ca59feba549f7fcf375562a7a6/crates/soa/src/lib.rs#L1
+
 pub mod either_index;
 pub mod index;
 pub mod slice;

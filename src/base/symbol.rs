@@ -39,6 +39,7 @@ pub struct Symbol {
 
 #[derive(Debug, Default, Clone)]
 pub struct SymbolStore {
+    // TODO: this is half-baked, figure out how this should be structured
     ident_ids_per_module: HashMap<u32, HashMap<ModuleId, Vec<IdentId>>>,
     next_ident_id_per_module: HashMap<ModuleId, u32>,
     text_index_per_symbol: HashMap<Symbol, u64>,

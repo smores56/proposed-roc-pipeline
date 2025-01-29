@@ -9,6 +9,8 @@ use super::layout::{LowerLayoutId, TagIdIntType, UnionLayout};
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct LowerExprId(pub(crate) Index<LowerExpr>);
 
+// TODO: should `LowerExpr` or `LowerStmt` hold the CompilerBug(LowerIrProblem)?
+
 #[derive(Debug)]
 pub enum LowerExpr {
     Str(StringLiteralId),
@@ -108,7 +110,7 @@ pub enum LowerCallType {
 
 #[derive(Debug)]
 pub struct LowerCall {
-    // TODO: put `call_type`
+    // TODO: consider putting `call_type` in a `Vec` in `LowerIR`
     pub call_type: LowerCallType,
     pub arguments: Slice<Symbol>,
 }

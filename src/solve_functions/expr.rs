@@ -12,7 +12,7 @@ use super::type_::FuncSolveTypeId;
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub struct FuncSolveExprId(pub(crate) Index<FuncSolveExpr>);
 
-#[derive(Clone, Copy, Debug, PartialEq)]
+#[derive(Clone, Debug, PartialEq)]
 pub enum FuncSolveExpr {
     Let(FuncSolveDef),
     Str(StringLiteralId),

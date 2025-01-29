@@ -9,7 +9,7 @@ use super::type_::FuncSolveTypeId;
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub struct FuncSolvePatternId(pub(crate) Index<FuncSolvePattern>);
 
-#[derive(Clone, Copy, Debug, PartialEq)]
+#[derive(Clone, Debug, PartialEq)]
 pub enum FuncSolvePattern {
     Identifier(IdentId),
     As(FuncSolvePatternId, IdentId),

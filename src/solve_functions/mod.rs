@@ -16,6 +16,8 @@ pub fn solve_functions(_func_lift_ir: &FuncLiftIR, _env: &mut Env) -> FuncSolveI
     todo!()
 }
 
+// TODO: figure out how to represent higher-order function arguments in this IR
+
 #[derive(Default)]
 pub struct FuncSolveIR {
     exprs: Vec<FuncSolveExpr>,
