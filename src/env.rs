@@ -7,10 +7,10 @@ use crate::{
     soa::{slice_extend_new, Index, Slice},
 };
 
+/// An environment containing indexable data useful throughout most or all stages
+/// in the new compiler pipeline.
 #[derive(Default)]
 pub struct Env {
-    // pub tuple_elem_indices: Vec<usize>,
-    // pub record_fields: Vec<RecordField<()>>,
     pub symbols: SymbolStore,
     // no deduping because these tend to be unique and potentially large
     string_literals: Vec<String>,
@@ -19,6 +19,9 @@ pub struct Env {
     problems: Vec<Problem>,
     // TODO: these should probably be made a part of `problems`
     compiler_problems: Vec<CompilerProblem>,
+    // TODO: where are these used, and how do we manage them?
+    // pub tuple_elem_indices: Vec<usize>,
+    // pub record_fields: Vec<RecordField<()>>,
 }
 
 impl Env {

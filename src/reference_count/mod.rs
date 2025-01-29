@@ -11,7 +11,13 @@ use crate::{
 
 pub mod stmt;
 
-// TODO: explain what this stage should do and a bit of how
+// Add reference counting operations to lowered IR to ensure correct and efficient
+// cleanup of memory automatically.
+//
+// There's no explanation of how this should work from Ayaz, this should be just simpler
+// version of what's implemented in the existing `mono` code in these two modules:
+// https://github.com/roc-lang/roc/blob/689c58f35e0a39ca59feba549f7fcf375562a7a6/crates/compiler/mono/src/borrow.rs#L1
+// https://github.com/roc-lang/roc/blob/689c58f35e0a39ca59feba549f7fcf375562a7a6/crates/compiler/mono/src/inc_dec.rs#L1
 pub fn reference_count(_lower_ir: &LowerIR, _env: &mut Env) -> RefCountIR {
     todo!()
 }

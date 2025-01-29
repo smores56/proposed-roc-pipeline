@@ -1,3 +1,6 @@
+//! A simplified mocking of the future `resolve_imports` compiler stage's artifacts,
+//! which is roughly the artifacts of today's `roc_can` compiler stage.
+
 use std::collections::HashMap;
 
 use crate::{

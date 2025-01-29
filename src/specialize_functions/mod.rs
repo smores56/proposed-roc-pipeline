@@ -8,7 +8,12 @@ use type_::{FuncSpecType, FuncSpecTypeId};
 
 use crate::{base::region::Region, env::Env, solve_functions::FuncSolveIR};
 
-// TODO: explain what this stage should do and a bit of how
+// Create copies of generic higher-order functions (HOFs) for concrete usage,
+// and then fix-up the call sites to reference the copy Moreover, we re-write
+// each function set to be a tag union that we pass to the function.
+//
+// Design by Ayaz for this stage:
+// https://github.com/roc-lang/rfcs/blob/ayaz/compile-with-lambda-sets/0102-compiling-lambda-sets.md#function_specialize
 pub fn specialize_functions(_func_solve_ir: &FuncSolveIR, _env: &mut Env) -> FuncSpecIR {
     todo!()
 }

@@ -16,13 +16,15 @@ pub mod expr;
 pub mod pattern;
 pub mod type_;
 
-//
-// SPECIALIZE_TYPES
-//
 // Create a concretely-typed copy of every generic definition in the program. We do this
 // by walking the program starting from the program's entry point and make a copy of every
 // definition based on each usage found.
 //
+// This is has been partially implemented already by Agus in the compiler:
+// https://github.com/roc-lang/roc/tree/main/crates/build/specialize_types
+//
+// Design by Ayaz for this stage:
+// https://github.com/roc-lang/rfcs/blob/ayaz/compile-with-lambda-sets/0102-compiling-lambda-sets.md#type_specialize
 pub fn specialize_types(_typecheck_ir: &ResolveIR, _env: &mut Env) -> TypeSpecIR {
     todo!()
 }

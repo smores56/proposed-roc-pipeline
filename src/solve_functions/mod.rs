@@ -8,7 +8,10 @@ use type_::{FuncSolveType, FuncSolveTypeId};
 
 use crate::{base::region::Region, env::Env, lift_functions::FuncLiftIR};
 
-// TODO: explain what this stage should do and a bit of how
+// Make higher-order function arguments to top-level functions "generic" over the values they capture.
+//
+// This one is a little tricky, so please ready Ayaz' description below for details:
+// https://github.com/roc-lang/rfcs/blob/ayaz/compile-with-lambda-sets/0102-compiling-lambda-sets.md#function_solve
 pub fn solve_functions(_func_lift_ir: &FuncLiftIR, _env: &mut Env) -> FuncSolveIR {
     todo!()
 }

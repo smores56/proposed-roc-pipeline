@@ -8,7 +8,11 @@ use layout::{LowerLayout, LowerLayoutId};
 
 use crate::{base::symbol::Symbol, env::Env, soa::Slice, specialize_functions::FuncSpecIR};
 
-// TODO: explain what this stage should do and a bit of how
+// Convert a purely first-order program to a low level IR mainly comprising
+// procedures and statements that, after adding refcounts, can be used directly for codegen.
+//
+// Design by Ayaz for this stage:
+// https://github.com/roc-lang/rfcs/blob/ayaz/compile-with-lambda-sets/0102-compiling-lambda-sets.md#lower_ir
 pub fn lower_ir(_func_spec_ir: &FuncSpecIR, _env: &mut Env) -> LowerIR {
     todo!()
 }
