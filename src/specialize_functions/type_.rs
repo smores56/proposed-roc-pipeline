@@ -4,9 +4,7 @@ use crate::{
 };
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
-pub struct FuncSpecTypeId {
-    index: Index<FuncSpecType>,
-}
+pub struct FuncSpecTypeId(pub(crate) Index<FuncSpecType>);
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum FuncSpecType {

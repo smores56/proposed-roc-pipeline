@@ -10,9 +10,7 @@ use super::pattern::FuncSpecPatternId;
 use super::type_::FuncSpecTypeId;
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
-pub struct FuncSpecExprId {
-    index: Index<FuncSpecExpr>,
-}
+pub struct FuncSpecExprId(pub(crate) Index<FuncSpecExpr>);
 
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub enum FuncSpecExpr {

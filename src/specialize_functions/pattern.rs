@@ -7,9 +7,7 @@ use crate::soa::{Index, Slice, Slice3};
 use super::type_::FuncSpecTypeId;
 
 #[derive(Clone, Copy, Debug, PartialEq)]
-pub struct FuncSpecPatternId {
-    inner: Index<FuncSpecPattern>,
-}
+pub struct FuncSpecPatternId(pub(crate) Index<FuncSpecPattern>);
 
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub enum FuncSpecPattern {

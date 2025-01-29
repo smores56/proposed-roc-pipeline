@@ -10,7 +10,7 @@ use super::pattern::TypeSpecPatternId;
 use super::type_::TypeSpecTypeId;
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
-pub struct TypeSpecExprId(Index<TypeSpecExpr>);
+pub struct TypeSpecExprId(pub(crate) Index<TypeSpecExpr>);
 
 #[derive(Clone, Debug, PartialEq)]
 pub enum TypeSpecExpr {

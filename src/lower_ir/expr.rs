@@ -1,21 +1,25 @@
 use crate::{
-    base::{foreign_symbol::ForeignSymbolId, low_level::LowLevelId, symbol::Symbol, Number},
+    base::{foreign_symbol::ForeignSymbolId, symbol::Symbol, LowLevel, Number},
     env::StringLiteralId,
-    soa::{NonEmptySlice, Slice},
+    soa::{Index, NonEmptySlice, Slice},
 };
 
-use super::{layout::LoweredLayoutId, stmt::TagIdIntType};
+use super::layout::{LowerLayoutId, TagIdIntType, UnionLayout};
 
-#[derive(Clone, Debug, PartialEq)]
-pub enum LoweredExpr {
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct LowerExprId(Index<LowerExpr>);
+
+#[derive(Debug)]
+pub enum LowerExpr {
     Str(StringLiteralId),
     Number(Number),
 
     // Functions
-    Call(LoweredCall),
+    Call(LowerCall),
 
     Tag {
-        tag_layout: UnionLayout<'a>,
+        // TODO: should this be an index instead?
+        tag_layout: UnionLayout,
         tag_id: TagIdIntType,
         arguments: Slice<Symbol>,
     },
@@ -24,83 +28,87 @@ pub enum LoweredExpr {
 
     StructAtIndex {
         index: u64,
-        field_layouts: &'a [InLayout<'a>],
+        field_layouts: Slice<LowerLayoutId>,
         structure: Symbol,
     },
 
     GetTagId {
         structure: Symbol,
-        union_layout: UnionLayout<'a>,
+        union_layout: UnionLayout,
     },
 
     UnionAtIndex {
         structure: Symbol,
         tag_id: TagIdIntType,
-        union_layout: UnionLayout<'a>,
+        union_layout: UnionLayout,
         index: u64,
     },
     GetElementPointer {
         structure: Symbol,
-        union_layout: UnionLayout<'a>,
-        indices: &'a [u64],
+        union_layout: UnionLayout,
+        indices: Slice<u64>,
     },
 
     Array {
-        elem_layout: InLayout<'a>,
-        elems: &'a [ListLiteralElement<'a>],
+        elem_layout: LowerLayoutId,
+        elems: Slice<ListLiteralElem>,
     },
     EmptyArray,
 
     /// Returns a pointer to the given function.
     FunctionPointer {
-        lambda_name: LambdaName<'a>,
+        symbol: Symbol,
     },
 
     Alloca {
-        element_layout: InLayout<'a>,
+        element_layout: LowerLayoutId,
         initializer: Option<Symbol>,
     },
 
     Reset {
         symbol: Symbol,
-        update_mode: UpdateModeId,
     },
 
     // Just like Reset, but does not recursively decrement the children.
     // Used in reuse analysis to replace a decref with a resetRef to avoid decrementing when the dec ref didn't.
     ResetRef {
         symbol: Symbol,
-        update_mode: UpdateModeId,
     },
+}
+
+#[derive(Clone, Copy, Debug, PartialEq)]
+pub enum ListLiteralElem {
+    Str(StringLiteralId),
+    Number(Number),
+    Symbol(Symbol),
 }
 
 #[derive(Clone, Debug, PartialEq, Eq)]
-pub enum LoweredCallType {
+pub enum LowerCallType {
     ByName {
-        name: LambdaName<'a>,
-        ret_layout: LoweredLayoutId,
-        // TODO: figure out if we should be using Slice<Index> or Slice<Item> in general
-        arg_layouts: Slice<LoweredLayoutId>,
-        specialization_id: CallSpecId,
+        symbol: Symbol,
+        ret_layout: LowerLayoutId,
+        arg_layouts: Slice<LowerLayoutId>,
     },
     ByPointer {
         pointer: Symbol,
-        ret_layout: LoweredLayoutId,
-        arg_layouts: Slice<LoweredLayoutId>,
+        ret_layout: LowerLayoutId,
+        arg_layouts: Slice<LowerLayoutId>,
     },
     Foreign {
         foreign_symbol: ForeignSymbolId,
-        ret_layout: LoweredLayoutId,
+        ret_layout: LowerLayoutId,
     },
     LowLevel {
-        op: LowLevelId,
-        update_mode: UpdateModeId,
+        op: LowLevel,
     },
-    HigherOrder(&'a HigherOrderLowLevel<'a>),
+    // TODO: presumably these should be removed in an earlier stage
+    // HigherOrder(&'a HigherOrderLowLevel<'a>),
 }
 
-pub struct LoweredCall {
+#[derive(Debug)]
+pub struct LowerCall {
     // TODO: put `call_type`
-    pub call_type: LoweredCallType,
+    pub call_type: LowerCallType,
     pub arguments: Slice<Symbol>,
 }

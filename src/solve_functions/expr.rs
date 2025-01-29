@@ -10,9 +10,7 @@ use super::pattern::FuncSolvePatternId;
 use super::type_::FuncSolveTypeId;
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
-pub struct FuncSolveExprId {
-    index: Index<FuncSolveExpr>,
-}
+pub struct FuncSolveExprId(pub(crate) Index<FuncSolveExpr>);
 
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub enum FuncSolveExpr {

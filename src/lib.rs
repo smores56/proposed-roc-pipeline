@@ -1,111 +1,52 @@
-use can::CanIR;
 use env::Env;
-use lower_ir::LoweredIR;
+use reference_count::RefCountIR;
+use resolve_imports::ResolveIR;
 
 pub mod base;
-pub mod can;
 pub mod env;
 pub mod lift_functions;
 pub mod lower_ir;
+pub mod reference_count;
+pub mod resolve_imports;
 pub mod soa;
 pub mod solve_functions;
 pub mod specialize_functions;
 pub mod specialize_types;
 
-fn pipe_ir_from_typechecking_to_codegen(typecheck_ir: CanIR, env: Env) -> LoweredIR {
-    // steps for the whole dang compiler (check and run):
-    // in common:
-    // - read the header of the passed module:
-    //   - if it has packages, find their root modules.
-    //     - register all .roc files with their respective root modules and shorthands
-    //     - register non .roc files as potential file content imports relative to their root modules
-    //   - if it doesn't have packages, it's not the root module, so search up the file tree for a `main.roc` ???
-    //     - if not found, treat the passed module as the root
-    // - for all modules found, parse and solo canonicalize in parallel
-    // - once done, combine all modules into a single module in `roc_can_combine`
-    // - once done, constrain, and then solve
-    // - if just typechecking, return
-    // - after that, run the lambda set compiling stages on the megamodule:
-    //   - type specialize
-    //   - function lift
-    //   - function solve
-    //   - function specialize
-    //   - refcount
-    //   - lower IR
-    // - in addition to the discovered modules for each package, register the modules
+// steps for the whole dang compiler (check and run):
+// in common:
+// - read the header of the passed module:
+//   - if it has packages, find their root modules.
+//     - register all .roc files with their respective root modules and shorthands
+//     - register non .roc files as potential file content imports relative to their root modules
+//   - if it doesn't have packages, it's not the root module, so search up the file tree for a `main.roc` ???
+//     - if not found, treat the passed module as the root
+// - for all modules found, parse and solo canonicalize in parallel
+// - once done, combine all modules into a single module in `roc_can_combine`
+// - once done, constrain, and then solve
+// - if just typechecking, return
+// - after that, run the lambda set compiling stages on the megamodule:
+//   - type specialize
+//   - function lift
+//   - function solve
+//   - function specialize
+//   - refcount
+//   - lower IR
+// - in addition to the discovered modules for each package, register the modules
+//
+// notes:
+// - typecheck_ir is the same IR from the `resolve_imports` stage because typechecking just narrows types on existing IR
+// - when we stop smooshing modules together, this will need to do more coordination, but the interfaces to each stage should be pretty similar to what they are here
+pub fn pipe_ir_from_typechecking_to_codegen(
+    typecheck_ir: ResolveIR,
+    mut env: Env,
+) -> (RefCountIR, Env) {
+    let type_spec_ir = specialize_types::specialize_types(&typecheck_ir, &mut env);
+    let func_lift_ir = lift_functions::lift_functions(&type_spec_ir, &mut env);
+    let func_solve_ir = solve_functions::solve_functions(&func_lift_ir, &mut env);
+    let func_spec_ir = specialize_functions::specialize_functions(&func_solve_ir, &mut env);
+    let lower_ir_data = lower_ir::lower_ir(&func_spec_ir, &mut env);
+    let ref_count_ir = reference_count::reference_count(&lower_ir_data, &mut env);
 
-    //
-    // SPECIALIZE_TYPES
-    //
-    // Create a concretely-typed copy of every generic definition in the program. We do this
-    // by walking the program starting from the program's entry point and make a copy of every
-    // definition based on each usage found.
-    //
-
-    let specialize_types_cache = MonoTypeCache::from_solved_subs(subs);
-    for var in typechecking_ir.vars {
-        let mono_var = specialize_types_cache.monomorphize_var(subs, mono_types, var, env);
-    }
-
-    //
-    // FUNCTION_LIFT
-    //
-    // Lift all nested functions to the top level. We do this by finding all values
-    // captured by a function (HERE, NOT IN CAN!)
-    //
+    (ref_count_ir, env)
 }
-
-//
-// MONO (CURRENT)
-//
-
-//  #[derive(Clone, Debug, PartialEq)]
-// pub enum Stmt<'a> {
-//     Let(Symbol, Expr<'a>, InLayout<'a>, &'a Stmt<'a>),
-//     Switch {
-//         /// This *must* stand for an integer, because Switch potentially compiles to a jump table.
-//         cond_symbol: Symbol,
-//         cond_layout: InLayout<'a>,
-//         /// The u64 in the tuple will be compared directly to the condition Expr.
-//         /// If they are equal, this branch will be taken.
-//         branches: &'a [(u64, BranchInfo<'a>, Stmt<'a>)],
-//         /// If no other branches pass, this default branch will be taken.
-//         default_branch: (BranchInfo<'a>, &'a Stmt<'a>),
-//         /// Each branch must return a value of this type.
-//         ret_layout: InLayout<'a>,
-//     },
-//     Ret(Symbol),
-//     Refcounting(ModifyRc, &'a Stmt<'a>),
-//     Expect {
-//         condition: Symbol,
-//         region: Region,
-//         lookups: &'a [Symbol],
-//         variables: &'a [LookupType],
-//         /// what happens after the expect
-//         remainder: &'a Stmt<'a>,
-//     },
-//     Dbg {
-//         /// The location this dbg is in source as a printable string.
-//         source_location: &'a str,
-//         /// The source code of the expression being debugged.
-//         source: &'a str,
-//         /// The expression we're displaying
-//         symbol: Symbol,
-//         /// The specialized variable of the expression
-//         variable: Variable,
-//         /// What happens after the dbg
-//         remainder: &'a Stmt<'a>,
-//     },
-//     /// a join point `join f <params> = <continuation> in remainder`
-//     Join {
-//         id: JoinPointId,
-//         parameters: &'a [Param<'a>],
-//         /// body of the join point
-//         /// what happens after _jumping to_ the join point
-//         body: &'a Stmt<'a>,
-//         /// what happens after _defining_ the join point
-//         remainder: &'a Stmt<'a>,
-//     },
-//     Jump(JoinPointId, &'a [Symbol]),
-//     Crash(Symbol, CrashTag),
-// }

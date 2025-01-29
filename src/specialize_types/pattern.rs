@@ -8,7 +8,7 @@ use super::type_::TypeSpecTypeId;
 use super::TypeSpecFieldId;
 
 #[derive(Clone, Copy, Debug, PartialEq)]
-pub struct TypeSpecPatternId(Index<TypeSpecPattern>);
+pub struct TypeSpecPatternId(pub(crate) Index<TypeSpecPattern>);
 
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub enum TypeSpecPattern {

@@ -1,12 +1,10 @@
 pub mod foreign_symbol;
 pub mod ident;
-pub mod low_level;
 pub mod module;
 pub mod problem;
 pub mod region;
 pub mod string_store;
 pub mod symbol;
-pub mod type_var;
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum Primitive {
@@ -53,5 +51,8 @@ pub enum Recursive {
     TailRecursive = 2,
 }
 
-#[derive(Debug, Copy, Clone, PartialEq, Eq)]
-pub struct Variable(u32);
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct LowLevel;
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct TypeVar(u32);

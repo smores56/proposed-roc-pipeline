@@ -1,24 +1,23 @@
 use crate::{
     base::{
         problem::{CompilerProblem, Problem},
-        string_store::DedupedStringId,
+        string_store::{DedupedStringId, DedupedStringStore},
         symbol::SymbolStore,
     },
-    soa::{Index, Slice},
+    soa::{slice_extend_new, Index, Slice},
 };
 
 #[derive(Default)]
 pub struct Env {
-    // utable: UnificationTable,
-    // pub variable_slices: Vec<VariableSubsSlice>,
     // pub tuple_elem_indices: Vec<usize>,
     // pub record_fields: Vec<RecordField<()>>,
     pub symbols: SymbolStore,
     // no deduping because these tend to be unique and potentially large
     string_literals: Vec<String>,
-    // field_names: FieldNameCache,
     tag_names: TagNameCache,
+    field_names: FieldNameCache,
     problems: Vec<Problem>,
+    // TODO: these should probably be made a part of `problems`
     compiler_problems: Vec<CompilerProblem>,
 }
 
@@ -30,12 +29,26 @@ impl Env {
         StringLiteralId(Index::new(len as u32))
     }
 
-    pub fn add_field_name(&mut self, s: &str) -> FieldNameId {
-        FieldNameId(self.field_names.insert(s))
+    pub fn add_field_name(&mut self, name: &str) -> FieldNameId {
+        self.field_names.add_name(name)
     }
 
-    pub fn add_tag_name(&mut self, s: &str) -> TagNameId {
-        TagNameId(self.tag_names.insert(s))
+    pub fn add_field_name_slice(
+        &mut self,
+        name_ids: impl IntoIterator<Item = FieldNameId>,
+    ) -> FieldNameIdSlice {
+        self.field_names.add_name_slice(name_ids)
+    }
+
+    pub fn add_tag_name(&mut self, name: &str) -> TagNameId {
+        self.tag_names.add_name(name)
+    }
+
+    pub fn add_tag_name_slice(
+        &mut self,
+        name_ids: impl IntoIterator<Item = TagNameId>,
+    ) -> TagNameIdSlice {
+        self.tag_names.add_name_slice(name_ids)
     }
 }
 
@@ -57,7 +70,37 @@ impl core::ops::Index<FieldNameId> for Env {
     type Output = str;
 
     fn index(&self, index: FieldNameId) -> &Self::Output {
-        &self.field_names[index.0]
+        &self.field_names.field_names[index.0]
+    }
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct FieldNameIdSlice(Slice<FieldNameId>);
+
+impl core::ops::Index<FieldNameIdSlice> for Env {
+    type Output = [FieldNameId];
+
+    fn index(&self, index: FieldNameIdSlice) -> &Self::Output {
+        &self.field_names.name_ids_for_slicing[index.0.indices()]
+    }
+}
+
+#[derive(Debug, Default)]
+pub struct FieldNameCache {
+    field_names: DedupedStringStore,
+    name_ids_for_slicing: Vec<FieldNameId>,
+}
+
+impl FieldNameCache {
+    pub fn add_name(&mut self, name: &str) -> FieldNameId {
+        FieldNameId(self.field_names.insert(name))
+    }
+
+    pub fn add_name_slice(
+        &mut self,
+        name_ids: impl IntoIterator<Item = FieldNameId>,
+    ) -> FieldNameIdSlice {
+        FieldNameIdSlice(slice_extend_new(&mut self.name_ids_for_slicing, name_ids))
     }
 }
 
@@ -68,27 +111,36 @@ impl core::ops::Index<TagNameId> for Env {
     type Output = str;
 
     fn index(&self, index: TagNameId) -> &Self::Output {
-        &self.tag_names[index.0]
+        &self.tag_names.tag_names[index.0]
     }
 }
 
-#[derive(Debug, Clone, Default)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct TagNameIdSlice(Slice<TagNameId>);
+
+impl core::ops::Index<TagNameIdSlice> for Env {
+    type Output = [TagNameId];
+
+    fn index(&self, index: TagNameIdSlice) -> &Self::Output {
+        &self.tag_names.name_ids_for_slicing[index.0.indices()]
+    }
+}
+
+#[derive(Debug, Default)]
 pub struct TagNameCache {
-    // [Err, Ok], Red, [Ok, Err]
-    tag_names: Vec<String>,
-    tag_names_slices: Vec<Slice<String>>,
+    tag_names: DedupedStringStore,
+    name_ids_for_slicing: Vec<TagNameId>,
 }
 
 impl TagNameCache {
-    pub fn get_mut(&mut self, tag_name: &TagName) -> Option<&mut SubsSlice<TagName>> {
-        match self.tag_names.iter().position(|u| u == tag_name) {
-            Some(index) => Some(&mut self.tag_names_slices[index]),
-            None => None,
-        }
+    pub fn add_name(&mut self, name: &str) -> TagNameId {
+        TagNameId(self.tag_names.insert(name))
     }
 
-    pub fn push(&mut self, tag_name: &TagName, slice: SubsSlice<TagName>) {
-        self.tag_names.push(tag_name.clone());
-        self.tag_names_slices.push(slice);
+    pub fn add_name_slice(
+        &mut self,
+        name_ids: impl IntoIterator<Item = TagNameId>,
+    ) -> TagNameIdSlice {
+        TagNameIdSlice(slice_extend_new(&mut self.name_ids_for_slicing, name_ids))
     }
 }

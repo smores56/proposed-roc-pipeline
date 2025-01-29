@@ -2,11 +2,16 @@ pub mod expr;
 pub mod pattern;
 pub mod type_;
 
-use expr::FuncSolveExpr;
-use pattern::FuncSolvePattern;
-use type_::FuncSolveType;
+use expr::{FuncSolveExpr, FuncSolveExprId};
+use pattern::{FuncSolvePattern, FuncSolvePatternId};
+use type_::{FuncSolveType, FuncSolveTypeId};
 
-use crate::base::region::Region;
+use crate::{base::region::Region, env::Env, lift_functions::FuncLiftIR};
+
+// TODO: explain what this stage should do and a bit of how
+pub fn solve_functions(_func_lift_ir: &FuncLiftIR, _env: &mut Env) -> FuncSolveIR {
+    todo!()
+}
 
 #[derive(Default)]
 pub struct FuncSolveIR {
@@ -16,4 +21,28 @@ pub struct FuncSolveIR {
     // pattern_regions: Vec<Region>,
     types: Vec<FuncSolveType>,
     // type_regions: Vec<Region>,
+}
+
+impl core::ops::Index<FuncSolveExprId> for FuncSolveIR {
+    type Output = FuncSolveExpr;
+
+    fn index(&self, index: FuncSolveExprId) -> &Self::Output {
+        &self.exprs[index.0.index()]
+    }
+}
+
+impl core::ops::Index<FuncSolvePatternId> for FuncSolveIR {
+    type Output = FuncSolvePattern;
+
+    fn index(&self, index: FuncSolvePatternId) -> &Self::Output {
+        &self.patterns[index.0.index()]
+    }
+}
+
+impl core::ops::Index<FuncSolveTypeId> for FuncSolveIR {
+    type Output = FuncSolveType;
+
+    fn index(&self, index: FuncSolveTypeId) -> &Self::Output {
+        &self.types[index.0.index()]
+    }
 }

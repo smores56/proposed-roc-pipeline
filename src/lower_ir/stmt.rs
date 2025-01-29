@@ -1,75 +1,78 @@
-use crate::{base::symbol::Symbol, soa::Index};
+use crate::{
+    base::symbol::Symbol,
+    soa::{Index, Slice},
+};
 
-pub type TagIdIntType = u16;
+use super::{
+    expr::LowerExprId,
+    layout::{LowerLayoutId, TagIdIntType},
+};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub struct LoweredStmtId {
-    index: Index<LoweredStmt>,
-}
+pub struct LowerStmtId(pub(crate) Index<RefCountStmt>);
 
 #[derive(Debug, Clone, PartialEq)]
-pub enum LoweredStmt {
+pub enum RefCountStmt {
     Let {
         symbol: Symbol,
-        expr: LoweredExpr,
-        layout: LoweredTypeId,
-        continuation: LoweredStmtId,
+        expr: LowerExprId,
+        layout: LowerExprId,
+        continuation: LowerStmtId,
     },
     Switch {
         /// This *must* stand for an integer, because Switch potentially compiles to a jump table.
         cond_symbol: Symbol,
-        cond_layout: InLayout<'a>,
+        cond_layout: LowerLayoutId,
         /// The u64 in the tuple will be compared directly to the condition Expr.
         /// If they are equal, this branch will be taken.
-        branches: &'a [(u64, BranchInfo<'a>, Stmt<'a>)],
+        branches: Slice<(u64, LowerBranchInfo, LowerStmtId)>,
         /// If no other branches pass, this default branch will be taken.
-        default_branch: (BranchInfo<'a>, &'a Stmt<'a>),
+        default_branch: (LowerBranchInfo, LowerStmtId),
         /// Each branch must return a value of this type.
-        ret_layout: InLayout<'a>,
+        ret_layout: LowerLayoutId,
     },
     Ret(Symbol),
-    Refcounting(ModifyRc, LoweredStmtId),
-    Expect {
-        condition: Symbol,
-        region: Region,
-        lookups: &'a [Symbol],
-        variables: &'a [LookupType],
-        /// what happens after the expect
-        remainder: &'a Stmt<'a>,
-    },
-    Dbg {
-        /// The location this dbg is in source as a printable string.
-        source_location: &'a str,
-        /// The source code of the expression being debugged.
-        source: &'a str,
-        /// The expression we're displaying
-        symbol: Symbol,
-        /// The specialized variable of the expression
-        variable: Variable,
-        /// What happens after the dbg
-        remainder: &'a Stmt<'a>,
-    },
     /// a join point `join f <params> = <continuation> in remainder`
     Join {
         id: JoinPointId,
-        parameters: &'a [Param<'a>],
+        parameters: Slice<Param>,
         /// body of the join point
         /// what happens after _jumping to_ the join point
-        body: &'a Stmt<'a>,
+        body: LowerStmtId,
         /// what happens after _defining_ the join point
-        remainder: &'a Stmt<'a>,
+        remainder: LowerStmtId,
     },
-    Jump(JoinPointId, &'a [Symbol]),
+    Jump(JoinPointId, Slice<Symbol>),
     Crash(Symbol, CrashTag),
+}
+
+#[derive(Clone, Debug, PartialEq, Copy, Eq, Hash)]
+pub struct JoinPointId(pub Symbol);
+
+/// Source of crash, and its runtime representation to roc_panic.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+#[repr(u32)]
+pub enum CrashTag {
+    /// The crash is due to Roc, either via a builtin or type error.
+    Roc = 0,
+    /// The crash is user-defined.
+    User = 1,
+}
+
+// TODO: rename
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub struct Param {
+    pub symbol: Symbol,
+    pub layout: LowerLayoutId,
 }
 
 /// in the block below, symbol `scrutinee` is assumed be be of shape `tag_id`
 #[derive(Clone, Debug, PartialEq, Eq)]
-pub enum BranchInfo<'a> {
+pub enum LowerBranchInfo {
     None,
     Constructor {
         scrutinee: Symbol,
-        layout: InLayout<'a>,
+        layout: LowerLayoutId,
         tag_id: TagIdIntType,
     },
     List {

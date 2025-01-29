@@ -10,9 +10,7 @@ use super::pattern::FuncLiftPatternId;
 use super::type_::FuncLiftTypeId;
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
-pub struct FuncLiftExprId {
-    index: Index<FuncLiftExpr>,
-}
+pub struct FuncLiftExprId(pub(crate) Index<FuncLiftExpr>);
 
 #[derive(Debug, Clone, PartialEq)]
 pub enum FuncLiftExpr {

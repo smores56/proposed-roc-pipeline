@@ -4,9 +4,7 @@ use crate::{
 };
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
-pub struct FuncLiftTypeId {
-    index: Index<FuncLiftType>,
-}
+pub struct FuncLiftTypeId(pub(crate) Index<FuncLiftType>);
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum FuncLiftType {

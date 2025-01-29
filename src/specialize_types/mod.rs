@@ -2,15 +2,15 @@ use std::collections::HashMap;
 use std::num::NonZeroU16;
 
 use expr::{TypeSpecExpr, TypeSpecExprId};
-use pattern::TypeSpecPatternId;
+use pattern::{TypeSpecPattern, TypeSpecPatternId};
 use type_::{TypeSpecType, TypeSpecTypeId};
 
 use crate::base::region::Region;
-use crate::base::symbol::{IdentId, Symbol};
-use crate::base::type_var::TypeVar;
-use crate::base::Variable;
+use crate::base::symbol::IdentId;
+use crate::base::TypeVar;
 use crate::env::{Env, FieldNameId};
-use crate::soa::{Slice, Slice2};
+use crate::resolve_imports::ResolveIR;
+use crate::soa::Slice2;
 
 pub mod expr;
 pub mod pattern;
@@ -23,15 +23,43 @@ pub mod type_;
 // by walking the program starting from the program's entry point and make a copy of every
 // definition based on each usage found.
 //
+pub fn specialize_types(_typecheck_ir: &ResolveIR, _env: &mut Env) -> TypeSpecIR {
+    todo!()
+}
 
 #[derive(Debug, Default)]
 pub struct TypeSpecIR {
-    entries: Vec<TypeSpecType>,
-    ids: Vec<TypeSpecTypeId>,
-    slices: Vec<(NonZeroU16, TypeSpecTypeId)>, // TODO make this a Vec2
-    // TODO convert to Vec2
     exprs: Vec<TypeSpecExpr>,
     expr_regions: Vec<Region>,
+    patterns: Vec<TypeSpecPattern>,
+    types: Vec<TypeSpecType>,
+    type_ids_for_slicing: Vec<TypeSpecTypeId>,
+    // TODO: do we need this yet?
+    slices: Vec<(NonZeroU16, TypeSpecTypeId)>,
+}
+
+impl core::ops::Index<TypeSpecExprId> for TypeSpecIR {
+    type Output = TypeSpecExpr;
+
+    fn index(&self, index: TypeSpecExprId) -> &Self::Output {
+        &self.exprs[index.0.index()]
+    }
+}
+
+impl core::ops::Index<TypeSpecPatternId> for TypeSpecIR {
+    type Output = TypeSpecPattern;
+
+    fn index(&self, index: TypeSpecPatternId) -> &Self::Output {
+        &self.patterns[index.0.index()]
+    }
+}
+
+impl core::ops::Index<TypeSpecTypeId> for TypeSpecIR {
+    type Output = TypeSpecType;
+
+    fn index(&self, index: TypeSpecTypeId) -> &Self::Output {
+        &self.types[index.0.index()]
+    }
 }
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
@@ -60,48 +88,5 @@ pub type TupleElemIds = HashMap<TypeSpecTypeId, HashMap<u16, TypeSpecFieldId>>;
 
 /// Variables that have already been monomorphized.
 pub struct TypeSpecTypeCache {
-    inner: HashMap<Variable, TypeSpecTypeId>,
+    types_by_var: HashMap<TypeVar, TypeSpecTypeId>,
 }
-
-impl TypeSpecTypeCache {
-    pub fn monomorphize_var(
-        &mut self,
-        // mono_types: &mut TypeSpecTypes,
-        var: TypeVar,
-        env: &mut Env,
-    ) -> TypeSpecTypeId {
-        lower_var(var, env)
-    }
-}
-
-// struct Env<'a, 'c, 'd, 'e, 'f, 'm, 'p, P> {
-//     arena: &'a Bump,
-//     cache: &'c mut TypeSpecTypeCache,
-//     mono_types: &'m mut TypeSpecTypes,
-//     field_ids: &'f mut RecordFieldIds,
-//     elem_ids: &'e mut TupleElemIds,
-// }
-
-fn lower_builtin(_symbol: Symbol, _args: Slice<TypeVar>, _env: &mut Env) -> TypeSpecTypeId {
-    todo!()
-}
-
-/// Exposed separately because sometimes we already looked up the Content and know it's a function,
-/// and want to continue from there without redoing the lookup.
-pub fn monomorphize_fn<'a, 'e>(
-    _arg_vars: Slice<Variable>,
-    _ret_var: TypeVar,
-    _env: &mut Env,
-) -> TypeSpecTypeId {
-    todo!()
-}
-
-fn lower_var(_var: TypeVar, _env: &mut Env) -> TypeSpecTypeId {
-    // let root_var = subs.get_root_key_without_compacting(var);
-    // if let Some(mono_id) = self.cache.inner.get(&root_var) {
-    //     return *mono_id;
-    // }
-
-    todo!()
-}
-// }

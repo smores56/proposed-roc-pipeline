@@ -1,21 +1,10 @@
-use core::num::NonZeroU16;
-
 use crate::{
     base::Primitive,
     soa::{Index, NonEmptySlice},
 };
 
-#[derive(Debug, Default)]
-pub struct TypeSpecTypes {
-    entries: Vec<TypeSpecType>,
-    ids: Vec<TypeSpecTypeId>,
-    slices: Vec<(NonZeroU16, TypeSpecTypeId)>, // TODO make this a Vec2
-}
-
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
-pub struct TypeSpecTypeId {
-    inner: Index<TypeSpecType>,
-}
+pub struct TypeSpecTypeId(pub(crate) Index<TypeSpecType>);
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum TypeSpecType {
