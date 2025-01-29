@@ -6,7 +6,7 @@ use std::collections::HashMap;
 
 use expr::{LowerExpr, LowerExprId};
 use layout::{LowerLayout, LowerLayoutId};
-use stmt::LowerStmtId;
+use stmt::{LowerStmt, LowerStmtId};
 
 use crate::{base::symbol::Symbol, env::Env, soa::Slice, specialize_functions::FuncSpecIR};
 
@@ -23,6 +23,14 @@ pub struct LowerIR {
     procs: HashMap<Symbol, LowerProcedure>,
     exprs: Vec<LowerExpr>,
     layouts: Vec<LowerLayout>,
+    stmts: Vec<LowerStmt>,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct LowerProcedure {
+    pub arguments: Slice<(Symbol, LowerLayout)>,
+    pub body: LowerStmtId,
+    pub return_layout: LowerLayoutId,
 }
 
 impl core::ops::Index<LowerExprId> for LowerIR {
@@ -41,9 +49,10 @@ impl core::ops::Index<LowerLayoutId> for LowerIR {
     }
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct LowerProcedure {
-    pub arguments: Slice<(Symbol, LowerLayout)>,
-    pub body: LowerStmtId,
-    pub return_layout: LowerLayoutId,
+impl core::ops::Index<LowerStmtId> for LowerIR {
+    type Output = LowerStmt;
+
+    fn index(&self, index: LowerStmtId) -> &Self::Output {
+        &self.stmts[index.0.index()]
+    }
 }

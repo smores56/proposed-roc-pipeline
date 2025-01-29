@@ -9,10 +9,10 @@ use super::{
 };
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub struct LowerStmtId(pub(crate) Index<RefCountStmt>);
+pub struct LowerStmtId(pub(crate) Index<LowerStmt>);
 
 #[derive(Debug, Clone, PartialEq)]
-pub enum RefCountStmt {
+pub enum LowerStmt {
     Let {
         symbol: Symbol,
         expr: LowerExprId,

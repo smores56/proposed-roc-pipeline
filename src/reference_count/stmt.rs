@@ -9,9 +9,7 @@ use crate::{
 };
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub struct RefCountStmtId {
-    index: Index<RefCountStmt>,
-}
+pub struct RefCountStmtId(pub(crate) Index<RefCountStmt>);
 
 #[derive(Debug, Clone, PartialEq)]
 pub enum RefCountStmt {
